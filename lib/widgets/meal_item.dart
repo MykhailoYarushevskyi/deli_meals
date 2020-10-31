@@ -4,20 +4,24 @@ import '../screens/meal_detail_screen.dart';
 import '../models/meal.dart';
 
 class MealItem extends StatelessWidget {
+  final String favoriteMode; // if called from FavoritsScreen then 'active'
   final String id;
   final String title;
   final String imageUrl;
   final int duration;
   final Complexity complexity;
   final Affordability affordability;
+  final Function removeItem;
 
   MealItem({
+    @required this.favoriteMode,
     @required this.id,
     @required this.title,
     @required this.imageUrl,
     @required this.duration,
     @required this.complexity,
     @required this.affordability,
+    @required this.removeItem,
   });
   String get complexityText {
     if (complexity == Complexity.Simple) return 'Simple';
@@ -45,8 +49,10 @@ class MealItem extends StatelessWidget {
   void selectMeal(BuildContext context) {
     Navigator.of(context).pushNamed(
       MealDetailScreen.routeName,
-      arguments: id,
-    );
+      arguments: {'id': id, 'favoriteMode': favoriteMode},
+    ).then((result) {
+      if (result != null) removeItem(result);
+    });
   }
 
   @override
@@ -81,7 +87,10 @@ class MealItem extends StatelessWidget {
                   right: 10,
                   child: Container(
                     width: 300,
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 5,
+                    ),
                     color: Colors.black38,
                     child: Text(
                       title,

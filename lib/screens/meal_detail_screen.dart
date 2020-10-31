@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
+import '../models/meal.dart';
 import '../dummy_data.dart';
 
 class MealDetailScreen extends StatelessWidget {
   static const routeName = '/meal-detail';
+  final Function toggleFavorite;
+  final Function isFavorite;
+  MealDetailScreen({this.toggleFavorite, this.isFavorite});
 
   Widget buildSectionTitle(BuildContext context, String text) {
     return Container(
@@ -34,7 +38,9 @@ class MealDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mealId = ModalRoute.of(context).settings.arguments as String;
+    final Map<String, String> arg = ModalRoute.of(context).settings.arguments;
+    final String favoriteMode = arg['favoriteMode'];
+    final mealId = arg['id'];
     final selectedMeal = DUMMY_MEALS.firstWhere((meal) => meal.id == mealId);
     return Scaffold(
       appBar: AppBar(
@@ -44,6 +50,22 @@ class MealDetailScreen extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: isFavorite(mealId)
+                ? Icon(
+                    Icons.star,
+                    color: Theme.of(context).accentColor,
+                  )
+                : Icon(
+                    Icons.star,
+                    color: Colors.grey,
+                  ),
+            onPressed: favoriteMode == 'active'
+                ? () => toggleFavorite(mealId)
+                : () => {},
+          )
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -94,6 +116,16 @@ class MealDetailScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(
+          Icons.delete,
+          color: Colors.red,
+        ),
+        onPressed: () {
+          if (Navigator.of(context).canPop() == true)
+            Navigator.of(context).pop(mealId);
+        },
       ),
     );
   }
